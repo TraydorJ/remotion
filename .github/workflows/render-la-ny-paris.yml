@@ -1,0 +1,39 @@
+name: Render LA-NY-Paris MP4
+
+on:
+  push:
+    branches: ["feat/la-ny-paris-composition"]
+    paths:
+      - "videos/la-ny-paris/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: videos/la-ny-paris
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Render MP4
+        run: npx remotion render src/index.ts LA-NY-PARIS out/la-ny-paris.mp4 --codec=h264 --concurrency=1
+      - name: Upload MP4 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: la-ny-paris-mp4
+          path: videos/la-ny-paris/out/la-ny-paris.mp4
+          if-no-files-found: error
+          retention-days: 14
