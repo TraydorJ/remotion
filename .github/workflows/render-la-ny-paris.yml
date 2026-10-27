@@ -18,8 +18,12 @@ jobs:
       run:
         working-directory: videos/la-ny-paris
     steps:
-      - name: Checkout
+      - name: Checkout only the standalone video project
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: videos/la-ny-paris
+          sparse-checkout-cone-mode: true
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
